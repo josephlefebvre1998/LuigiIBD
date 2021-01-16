@@ -34,13 +34,18 @@ class SQLiteTableTarget(luigi.Target):
 class CreateDB(luigi.Task):
     
     db_file_name=luigi.Parameter()
+    task_complete=False
     
     def output(self):
-        return luigi.LocalTarget(self.db_file_name)
+        return luigi.LocalTarget(self.db_file_name).makedirs()
     
     def run(self):
         with sqlite3.connect(self.db_file_name) as c:
             pass
+        task_complete = True
+        
+    def complete(self):
+        return self.task_complete
 
 class GetData(luigi.Task):
     
@@ -60,17 +65,21 @@ class GetData(luigi.Task):
 class Top10Entrees(luigi.Task):
     
     engine_name = luigi.Parameter(default='eq')
+    task_complete=False
     
     def requires(self):
         return GetData()
     
     def output(self):
-        return luigi.LocalTarget("data/top_10_entrees_cine_idf.csv")
+        return luigi.LocalTarget("data/top_10_entrees_cine_idf.csv").makedirs()
 
     def run(self):
         top_10 = pandas.read_sql("SELECT * FROM cine ORDER BY entrees LIMIT 10",con=DB_ENGINES[self.engine_name])
         top_10.to_csv("data/top_10_entrees_cine_idf.csv")
+        self.task_complete=True
         
+    def complete(self):
+        return self.task_complete        
         
 class DataFromDpt(luigi.Task):
     
@@ -82,7 +91,7 @@ class DataFromDpt(luigi.Task):
         return GetData()
     
     def output(self):
-        return luigi.LocalTarget("data/cine_dept_%s.tsv" % self.num_dpt)
+        return luigi.LocalTarget("data/cine_dept_%s.tsv" % self.num_dpt).makedirs()
     
     def run(self):
         data_dpt = pandas.read_sql("SELECT * FROM cine WHERE dep="+self.num_dpt,con=DB_ENGINES[self.engine_name])
@@ -102,16 +111,21 @@ class DatasFromAllDpts(luigi.Task):
         list_dpt = pandas.read_sql("SELECT DISTINCT dep FROM cine",con=DB_ENGINES[self.engine_name])
         return [DataFromDpt(str(row['dep'])) for index,row in list_dpt.iterrows()]
     
-    def complete(self):
-        return self.task_complete
-    
     def run(self):
         self.task_complete = True
         
-class AllEndTasks(luigi.Task):
+    def complete(self):
+        return self.task_complete
+
+class allEndTasks(luigi.Task):
+    
+    task_complete = False
     
     def requires(self):
         return DatasFromAllDpts(),Top10Entrees()
     
     def run(self):
-        pass
+        self.task_complete = True
+    
+    def complete(self):
+        return self.task_complete
