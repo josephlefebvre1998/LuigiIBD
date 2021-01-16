@@ -4,7 +4,6 @@ As part of a universitary course, we choose to try and test a pipeline package.
 Luigi is developped by Spotify and his purpose is ton address all the plumbing of batch processes.
 
 ## Setup Environnement
-------
 
 ### Install Python (3.7 or higher)
 
@@ -23,7 +22,7 @@ pip install pandas
 pip install sqlalchemy
 ```
 ## Use luigi
-------
+
 ### Run Central Luigi Scheduler
 
 #### Directly on your computer
@@ -49,7 +48,6 @@ python -m luigi --module module_name TaskName --local-scheduler --remove_delay 3
 python -m luigi --module module_name TaskName --scheduler-host localhost --remove_delay 3600
 ```
 ## Use Project
-------
 
 ### Run project
 
@@ -59,7 +57,6 @@ python -m luigi --module cine_idf AllEndTasks --scheduler-host localhost --sched
 ```
 
 ## References
-------
 
 https://luigi.readthedocs.io/en/stable/index.html 
 https://kapernikov.com/using-luigi-to-power-a-reporting-pipeline/ 
