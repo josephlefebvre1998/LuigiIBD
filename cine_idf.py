@@ -33,16 +33,16 @@ class SQLiteTableTarget(luigi.Target):
   
 class CreateDB(luigi.Task):
     
-    db_file_name=luigi.Parameter()
+    db_file_name=luigi.Parameter(default=MAIN_DB_PATH)
     task_complete=False
     
     def output(self):
-        return luigi.LocalTarget(self.db_file_name).makedirs()
+        return luigi.LocalTarget(self.db_file_name)
     
     def run(self):
         with sqlite3.connect(self.db_file_name) as c:
             pass
-        task_complete = True
+        self.task_complete = True
         
     def complete(self):
         return self.task_complete
@@ -71,7 +71,7 @@ class Top10Entrees(luigi.Task):
         return GetData()
     
     def output(self):
-        return luigi.LocalTarget("data/top_10_entrees_cine_idf.csv").makedirs()
+        return luigi.LocalTarget("data/top_10_entrees_cine_idf.csv")
 
     def run(self):
         top_10 = pandas.read_sql("SELECT * FROM cine ORDER BY entrees LIMIT 10",con=DB_ENGINES[self.engine_name])
@@ -91,7 +91,7 @@ class DataFromDpt(luigi.Task):
         return GetData()
     
     def output(self):
-        return luigi.LocalTarget("data/cine_dept_%s.tsv" % self.num_dpt).makedirs()
+        return luigi.LocalTarget("data/cine_dept_%s.tsv" % self.num_dpt)
     
     def run(self):
         data_dpt = pandas.read_sql("SELECT * FROM cine WHERE dep="+self.num_dpt,con=DB_ENGINES[self.engine_name])

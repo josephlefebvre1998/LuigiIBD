@@ -59,7 +59,7 @@ python -m luigi --module module_name TaskName --scheduler-host localhost --remov
 
 #### Run all tasks about cinemas
 ```
-python -m luigi --module cine_idf AllEndTasks --scheduler-host localhost --scheduler-remove-delay 3600
+python -m luigi --module cine_idf allEndTasks --scheduler-host localhost --scheduler-remove-delay 3600
 ```
 
 ## References
