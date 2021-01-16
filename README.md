@@ -33,7 +33,7 @@ luigid
 ### Using docker (image from docker hub)
 
 ```
-docker run --name luigid -p 8082:8082 -d tenshiroque/luigid:1
+docker run --name luigid --restart always -p 8082:8082 -d tenshiroque/luigid:1
 ```
 
 ### Using docker (build image locally)
