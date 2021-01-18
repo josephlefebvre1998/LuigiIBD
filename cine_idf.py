@@ -143,16 +143,30 @@ class DatasFromAllDpts(luigi.Task):
         
     def complete(self):
         return self.task_complete
-
-class allEndTasks(luigi.Task):
     
+class EntreesPerDpt(luigi.Task):
+    
+    engine_name = luigi.Parameter(default='eq')
     task_complete = False
     
     def requires(self):
-        return DatasFromAllDpts(),Top10Entrees()
+        return GetData()
+    
+    def output(self):
+        return luigi.LocalTarget(OUTPUT_DIRECTORY+"/entrees_per_dept_cine_idf.tsv")
     
     def run(self):
+        entrees_per_dept = pandas.read_sql("SELECT sum(entrees),dep FROM cine GROUP BY dep",con=DB_ENGINES[self.engine_name])
+        entrees_per_dept.to_csv(OUTPUT_DIRECTORY+"/entrees_per_dept_cine_idf.csv")
         self.task_complete = True
-    
+        
     def complete(self):
         return self.task_complete
+                
+
+class allEndTasks(luigi.WrapperTask):
+    
+    def requires(self):
+        yield Top10Entrees()
+        yield DatasFromAllDpts()
+        yield EntreesPerDpt()
