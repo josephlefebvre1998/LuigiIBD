@@ -5,6 +5,8 @@ from sqlalchemy import engine
 import sqlalchemy
 import pandas
 import os
+import osmapi
+import gmplot
   
   
 OUTPUT_DIRECTORY = 'data'
@@ -112,7 +114,7 @@ class DataFromDpt(luigi.Task):
         return GetData()
     
     def output(self):
-        return luigi.LocalTarget(OUTPUT_DIRECTORY+"/cine_dept_%s.tsv" % self.num_dpt)
+        return luigi.LocalTarget(OUTPUT_DIRECTORY+"/cine_dept_%s.csv" % self.num_dpt)
     
     def run(self):
         data_dpt = pandas.read_sql("SELECT * FROM cine WHERE dep="+self.num_dpt,con=DB_ENGINES[self.engine_name])
@@ -153,7 +155,7 @@ class EntreesPerDpt(luigi.Task):
         return GetData()
     
     def output(self):
-        return luigi.LocalTarget(OUTPUT_DIRECTORY+"/entrees_per_dept_cine_idf.tsv")
+        return luigi.LocalTarget(OUTPUT_DIRECTORY+"/entrees_per_dept_cine_idf.csv")
     
     def run(self):
         entrees_per_dept = pandas.read_sql("SELECT sum(entrees),dep FROM cine GROUP BY dep",con=DB_ENGINES[self.engine_name])
@@ -162,7 +164,54 @@ class EntreesPerDpt(luigi.Task):
         
     def complete(self):
         return self.task_complete
-                
+    
+class CreateOSM(luigi.Task):
+    
+    task_complete = False
+    engine_name = luigi.Parameter(default='eq')
+    
+    def requires(self):
+        return GetData()
+    
+    def run(self):
+        api = osmapi.OsmApi(api="https://api06.dev.openstreetmap.org", username = u"jlefebvre", password = u"yY@o6LNDHM")
+        api.ChangesetCreate({u"cinemas d'ile de france": u"MyCineMap"})
+        all = pandas.read_sql("SELECT * FROM cine",con=DB_ENGINES[self.engine_name])
+        for index,row in all.iterrows():
+            values = row["geo"].split(",")
+            api.NodeCreate({u"lon":values[1],u"lat":values[0],u"tag":{}})
+        api.ChangesetClose()
+        self.task_complete = True
+        
+    def complete(self):
+        return self.task_complete
+    
+class CreateGMap(luigi.Task):
+    
+    task_complete = False
+    engine_name = luigi.Parameter(default='eq')
+    
+    def requires(self):
+        return GetData()
+    
+    def output(self):
+        return luigi.LocalTarget(OUTPUT_DIRECTORY+"/map.html")
+    
+    def run(self):
+        gmap = gmplot.GoogleMapPlotter(48.856613, 2.352222, 9,apikey="AIzaSyDfxxC2rFI9Ywn6FnMoCG3-p0p7hy4a-6U")
+        all = pandas.read_sql("SELECT * FROM cine",con=DB_ENGINES[self.engine_name])
+        lats = []
+        longs = []
+        for index,row in all.iterrows():
+            values = row["geo"].split(",")
+            lats.append(float(values[0]))
+            longs.append(float(values[1]))
+        gmap.scatter(lats,longs,"cornflowerblue")
+        gmap.draw(OUTPUT_DIRECTORY+"/map.html")
+        self.task_complete = True
+        
+    def complete(self):
+        return self.task_complete
 
 class allEndTasks(luigi.WrapperTask):
     
@@ -170,3 +219,5 @@ class allEndTasks(luigi.WrapperTask):
         yield Top10Entrees()
         yield DatasFromAllDpts()
         yield EntreesPerDpt()
+        # yield CreateOSM()
+        yield CreateGMap()
