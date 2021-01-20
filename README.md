@@ -33,13 +33,14 @@ luigid
 ### Using docker (image from docker hub)
 
 ```
-docker run --name luigid --restart always -p 8082:8082 -d tenshiroque/luigid:1.1
+docker run --name luigid --restart always -p 8082:8082 -d tenshiroque/luigid:1.3
 ```
 
 ### Using docker (build image locally)
 
 ```
 docker build -t luigid .
+docker run --name luigid --restart always -p 8082:8082 -d luigid
 ```
 
 ### Run luigi modules
@@ -64,5 +65,6 @@ python -m luigi --module cine_idf allEndTasks --scheduler-host localhost --sched
 
 ## References
 
+https://cloud.google.com/kubernetes-engine/docs/tutorials/hello-app?hl=fr 
 https://luigi.readthedocs.io/en/stable/index.html 
 https://kapernikov.com/using-luigi-to-power-a-reporting-pipeline/ 
