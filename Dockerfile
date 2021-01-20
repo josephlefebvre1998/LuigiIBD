@@ -1,6 +1,6 @@
 FROM python:3.7
-LABEL luigid
+LABEL maintainer="joseph.lefebvre@etu.imt-lille-douai.fr"
 CMD ["/bin/sh"]
-RUN pip install
+RUN pip install luigi
 EXPOSE 8082/tcp
-ENTRYPOINT ["luigid --remove_delay 3600"]
+ENTRYPOINT ["luigid"]
