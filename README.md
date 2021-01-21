@@ -49,17 +49,17 @@ docker run --name luigid --restart always -p 8082:8082 -d luigid
 
 #### Run luigi modules locally
 ```
-python -m luigi --module module_name TaskName --local-scheduler --remove_delay 3600
+python -m luigi --module module_name TaskName --local-scheduler --scheduler-remove-delay 3600
 ```
 
 #### Run luigi modules in localhost Central scheduler
 ```
-python -m luigi --module module_name TaskName --scheduler-host localhost --remove_delay 3600
+python -m luigi --module module_name TaskName --scheduler-host localhost --scheduler-remove-delay 3600
 ```
 
 #### Run luigi modules in distant Central scheduler (GKE)
 ```
-python -m luigi --module module_name TaskName --scheduler-host 34.76.39.92 --remove_delay 3600
+python -m luigi --module module_name TaskName --scheduler-host 34.76.39.92 --scheduler-remove-delay 3600
 ```
 
 ## Use Project
