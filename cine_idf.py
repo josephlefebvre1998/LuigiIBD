@@ -4,10 +4,9 @@ import luigi
 from sqlalchemy import engine
 import sqlalchemy
 import pandas
-import os
 import osmapi
 import gmplot
-  
+import os  
   
 OUTPUT_DIRECTORY = 'data'
 # Main DB against which the queries will be run

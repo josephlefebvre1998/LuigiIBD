@@ -20,6 +20,8 @@ pip install luigi
 ```
 pip install pandas
 pip install sqlalchemy
+pip install gmplot
+pip install osmapi
 ```
 ## Use luigi
 
@@ -66,7 +68,7 @@ python -m luigi --module module_name TaskName --scheduler-host 34.76.39.92 --rem
 
 #### Run all tasks about cinemas
 ```
-python -m luigi --module cine_idf allEndTasks --scheduler-host localhost --scheduler-remove-delay 3600
+python -m luigi --module cine_idf allEndTasks --scheduler-host localhost --scheduler-remove-delay 3600  
 ```
 
 ## References
